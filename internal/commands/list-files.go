@@ -7,8 +7,8 @@ import (
 	"github.com/nudopnu/obsidian-cli/internal"
 )
 
-func ListFiles() error {
-	data, err := internal.Call("/vault/")
+func ListFiles(path string) error {
+	data, err := internal.Call("/vault/" + path)
 	if err != nil {
 		return err
 	}

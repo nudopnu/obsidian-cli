@@ -1,17 +1,30 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/nudopnu/obsidian-cli/internal"
 	"github.com/nudopnu/obsidian-cli/internal/commands"
 )
 
 func parse_command(cmd string) {
-	switch cmd {
+	parts := strings.Split(cmd, " ")
+	arg := ""
+	if len(parts) > 1 {
+		arg = parts[1]
+	}
+	switch parts[0] {
 	case "ls":
-		commands.ListFiles()
+		commands.ListFiles(arg)
 		return
+	case "cat":
+		commands.Cat(arg)
+		return
+	case "get":
+		internal.Call(arg)
 	case "exit":
 		os.Exit(1)
 	default:
@@ -20,10 +33,12 @@ func parse_command(cmd string) {
 }
 
 func main() {
-	var cmd string
+	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print("> ")
-		fmt.Scan(&cmd)
-		parse_command(cmd)
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		fmt.Println(input)
+		parse_command(input)
 	}
 }
