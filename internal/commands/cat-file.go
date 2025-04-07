@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/url"
 
@@ -13,8 +14,12 @@ func Cat(file string) {
 		location, err := url.ParseRequestURI(file)
 		queries, err := url.ParseQuery(location.RawQuery)
 		filepath := "/vault/" + queries["file"][0] + ".md"
-		data, err := internal.Call(filepath)
-		fmt.Println(data)
+		reader, err := internal.Call(filepath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := io.ReadAll(reader)
+		fmt.Println(string(data))
 		if err != nil {
 			log.Fatal(err)
 		}

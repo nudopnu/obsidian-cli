@@ -15,7 +15,7 @@ const (
 	localCertFile = "obsidian-local-rest-api.crt"
 )
 
-func Call(path string) (map[string]interface{}, error) {
+func Call(path string) (io.ReadCloser, error) {
 	fmt.Printf("Calling %s ...\n", path)
 	// Get the SystemCertPool, continue with an empty pool on error
 	rootCAs, _ := x509.SystemCertPool()
@@ -51,11 +51,15 @@ func Call(path string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %w", err)
 	}
-	var data map[string]interface{}
-	str, err := io.ReadAll(res.Body)
+	return res.Body, nil
+}
+
+func ToDict(reader io.ReadCloser) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	decoder := json.NewDecoder(reader)
+	err := decoder.Decode(&result)
 	if err != nil {
-		return nil, fmt.Errorf("error reading response: %w", err)
+		return nil, err
 	}
-	json.Unmarshal(str, &data)
-	return data, nil
+	return result, nil
 }

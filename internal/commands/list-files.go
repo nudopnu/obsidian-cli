@@ -8,7 +8,11 @@ import (
 )
 
 func ListFiles(path string) error {
-	data, err := internal.Call("/vault/" + path)
+	reader, err := internal.Call("/vault/" + path)
+	if err != nil {
+		return err
+	}
+	data, err := internal.ToDict(reader)
 	if err != nil {
 		return err
 	}
