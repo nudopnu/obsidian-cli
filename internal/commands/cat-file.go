@@ -5,30 +5,9 @@ import (
 	"io"
 	"log"
 	"net/url"
-	"regexp"
-	"strings"
-)
 
-func clean(text string) string {
-	lines := strings.Split(text, "\n")
-	var resultlines []string
-	isMetadata := false
-	var re1 = regexp.MustCompile(`\[\[([^|]+)\]\]`)
-	var re2 = regexp.MustCompile(`\[\[[^\]]*?\|(.*?)\]\]`)
-	if lines[0][:3] == "---" {
-		isMetadata = true
-	}
-	for idx, line := range lines {
-		if isMetadata && idx > 0 && line[:3] != "---" {
-			continue
-		}
-		isMetadata = false
-		line = re1.ReplaceAllString(line, `$1`)
-		line = re2.ReplaceAllString(line, `$1`)
-		resultlines = append(resultlines, line)
-	}
-	return strings.Join(resultlines, "\n")
-}
+	"github.com/nudopnu/obsidian-cli/internal"
+)
 
 func (state *State) Cat(path string) {
 	if len(path) > 8 && path[:9] == "obsidian:" {
@@ -51,7 +30,21 @@ func (state *State) Cat(path string) {
 		}
 		content := string(data)
 		if state.Plain {
-			content = clean(content)
+			content = internal.Clean(content)
+		}
+		fmt.Println(content)
+	} else if path == "" {
+		reader, err := state.Call("/active/")
+		if err != nil {
+			log.Fatal(err)
+		}
+		data, err := io.ReadAll(reader)
+		if err != nil {
+			log.Fatal(err)
+		}
+		content := string(data)
+		if state.Plain {
+			content = internal.Clean(content)
 		}
 		fmt.Println(content)
 	}

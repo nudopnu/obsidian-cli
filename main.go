@@ -17,7 +17,7 @@ func main() {
 			{
 				Name:    "curl",
 				Aliases: []string{"c"},
-				Usage:   "Print out the content of an obsidian md file by providing its url",
+				Usage:   "Print out the content of an obsidian md file by providing its URL. If no URL is provided, the current opened file is taken.",
 				Action: func(cCtx *cli.Context) error {
 					state.Cat(cCtx.Args().First())
 					return nil
@@ -25,7 +25,7 @@ func main() {
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:        "plain",
-						Usage:       "remove links from output",
+						Usage:       "Remove links from output",
 						Aliases:     []string{"p"},
 						Destination: &state.Plain,
 					},
