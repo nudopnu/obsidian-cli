@@ -16,7 +16,7 @@ const (
 )
 
 func Call(path string) (io.ReadCloser, error) {
-	fmt.Printf("Calling %s ...\n", path)
+	// fmt.Printf("Calling %s ...\n", path)
 	// Get the SystemCertPool, continue with an empty pool on error
 	rootCAs, _ := x509.SystemCertPool()
 	if rootCAs == nil {

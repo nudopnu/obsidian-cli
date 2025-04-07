@@ -1,44 +1,37 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
+	"log"
 	"os"
-	"strings"
 
-	"github.com/nudopnu/obsidian-cli/internal"
 	"github.com/nudopnu/obsidian-cli/internal/commands"
+	"github.com/urfave/cli/v2" // imports as package "cli"
 )
 
-func parse_command(cmd string) {
-	parts := strings.Split(cmd, " ")
-	arg := ""
-	if len(parts) > 1 {
-		arg = parts[1]
-	}
-	switch parts[0] {
-	case "ls":
-		commands.ListFiles(arg)
-		return
-	case "cat":
-		commands.Cat(arg)
-		return
-	case "get":
-		internal.Call(arg)
-	case "exit":
-		os.Exit(1)
-	default:
-		fmt.Printf("Unknown command '%s'\n", cmd)
-	}
-}
-
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		fmt.Print("> ")
-		input, _ := reader.ReadString('\n')
-		input = strings.TrimSpace(input)
-		fmt.Println(input)
-		parse_command(input)
+	plain := false
+	app := &cli.App{
+		Commands: []*cli.Command{
+			{
+				Name:    "curl",
+				Aliases: []string{"c"},
+				Usage:   "Print out the content of an obsidian md file by providing its url",
+				Action: func(cCtx *cli.Context) error {
+					commands.Cat(cCtx.Args().First(), plain)
+					return nil
+				},
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:        "plain",
+						Usage:       "remove links from output",
+						Aliases:     []string{"p"},
+						Destination: &plain,
+					},
+				},
+			},
+		},
+	}
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
 }
