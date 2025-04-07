@@ -7,8 +7,8 @@ import (
 	"github.com/nudopnu/obsidian-cli/internal"
 )
 
-func ListFiles(path string) error {
-	reader, err := internal.Call("/vault/" + path)
+func (state *State) ListFiles(path string) error {
+	reader, err := state.Call("/vault/" + path)
 	if err != nil {
 		return err
 	}

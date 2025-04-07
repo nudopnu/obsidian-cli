@@ -7,8 +7,6 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
-
-	"github.com/nudopnu/obsidian-cli/internal"
 )
 
 func clean(text string) string {
@@ -32,7 +30,7 @@ func clean(text string) string {
 	return strings.Join(resultlines, "\n")
 }
 
-func Cat(path string, plain bool) {
+func (state *State) Cat(path string) {
 	if len(path) > 8 && path[:9] == "obsidian:" {
 		location, err := url.ParseRequestURI(path)
 		if err != nil {
@@ -43,7 +41,7 @@ func Cat(path string, plain bool) {
 			log.Fatal(err)
 		}
 		filepath := "/vault/" + queries["file"][0] + ".md"
-		reader, err := internal.Call(filepath)
+		reader, err := state.Call(filepath)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -52,7 +50,7 @@ func Cat(path string, plain bool) {
 			log.Fatal(err)
 		}
 		content := string(data)
-		if plain {
+		if state.Plain {
 			content = clean(content)
 		}
 		fmt.Println(content)
