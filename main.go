@@ -4,11 +4,13 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/nudopnu/obsidian-cli/internal/commands"
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
+	_ = godotenv.Load(".env")
 	state := commands.State{}
 	app := &cli.App{
 		Commands: []*cli.Command{
