@@ -60,6 +60,14 @@ func main() {
 					state.AddNote(deckname, title, content)
 					return nil
 				},
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "api_key",
+						Usage:       "Provide your API key via flag or environment variable `API_KEY`. You can obtain it in the plugin settings in obsidian.",
+						EnvVars:     []string{"API_KEY"},
+						Destination: &state.ApiKey,
+					},
+				},
 			},
 			{
 				Name:    "deck",
