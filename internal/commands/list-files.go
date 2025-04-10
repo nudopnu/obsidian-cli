@@ -8,7 +8,7 @@ import (
 )
 
 func (state *State) ListFiles(path string) error {
-	reader, err := state.Call("/vault/" + path)
+	reader, err := state.CallObsidian("/vault/"+path, nil)
 	if err != nil {
 		return err
 	}

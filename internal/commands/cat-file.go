@@ -1,15 +1,16 @@
 package commands
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"log"
 	"net/url"
+	"strings"
 
 	"github.com/nudopnu/obsidian-cli/internal"
 )
 
-func (state *State) Cat(path string) {
+func (state *State) Curl(path string) (title, content string, err error) {
 	if len(path) > 8 && path[:9] == "obsidian:" {
 		location, err := url.ParseRequestURI(path)
 		if err != nil {
@@ -19,8 +20,9 @@ func (state *State) Cat(path string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		filepath := "/vault/" + queries["file"][0] + ".md"
-		reader, err := state.Call(filepath)
+		title := queries["file"][0]
+		filepath := "/vault/" + title + ".md"
+		reader, err := state.CallObsidian(filepath, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -32,20 +34,27 @@ func (state *State) Cat(path string) {
 		if state.Plain {
 			content = internal.Clean(content)
 		}
-		fmt.Println(content)
+		return title, content, nil
 	} else if path == "" {
-		reader, err := state.Call("/active/")
+		reader, err := state.CallObsidian("/active/", map[string]string{
+			"accept": "application/vnd.olrapi.note+json",
+		})
 		if err != nil {
 			log.Fatal(err)
 		}
-		data, err := io.ReadAll(reader)
+		dict, err := internal.ToDict(reader)
 		if err != nil {
 			log.Fatal(err)
 		}
-		content := string(data)
+		path := dict["path"].(string)
+		content := dict["content"].(string)
+		parts := strings.Split(path, "/")
+		title := parts[len(parts)-1]
+		title = title[:len(title)-3]
 		if state.Plain {
 			content = internal.Clean(content)
 		}
-		fmt.Println(content)
+		return title, content, nil
 	}
+	return "", "", errors.New("invalid path")
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func (state *State) LocateCurrentFile() {
-	reader, err := state.Call("/active/")
+	reader, err := state.CallObsidian("/active/", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
