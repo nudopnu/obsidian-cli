@@ -4,42 +4,24 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 )
 
-func (*State) AddDeck(deckName string) {
-	// Prepare the AnkiConnect payload
-	payload := map[string]interface{}{
-		"action":  "createDeck",
-		"version": 6,
-		"params": map[string]interface{}{
-			"deck": deckName,
-		},
-	}
-
-	// Convert the payload to JSON
+func (*State) CallAnki(payload map[string]interface{}) (io.ReadCloser, error) {
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
-		fmt.Println("Error marshalling JSON:", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("error marshalling json: %w", err)
 	}
 
 	// Send the request to AnkiConnect
 	resp, err := http.Post("http://localhost:8765", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		fmt.Println("HTTP request failed:", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("http request failed: %w", err)
 	}
-	defer resp.Body.Close()
-
-	// Decode the response
-	var result map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		fmt.Println("Error decoding response:", err)
-		os.Exit(1)
-	}
+	return resp.Body, nil
 }
 
 func (*State) AddNote(deckName, front, back string) {
@@ -58,7 +40,6 @@ func (*State) AddNote(deckName, front, back string) {
 				"options": map[string]bool{
 					"allowDuplicate": false,
 				},
-				"tags": []string{"geography", "example"},
 			},
 		},
 	}

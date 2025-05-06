@@ -70,7 +70,15 @@ func main() {
 				},
 			},
 			{
+				Name: "list",
+				Action: func(ctx *cli.Context) error {
+					state.ListDueCards("", 10)
+					return nil
+				},
+			},
+			{
 				Name:    "deck",
+				Usage:   "Adds a new deck to Anki",
 				Aliases: []string{"d"},
 				Action: func(ctx *cli.Context) error {
 					name := ctx.Args().First()
@@ -78,7 +86,7 @@ func main() {
 						fmt.Println("the deck name must not be empty")
 						os.Exit(1)
 					}
-					state.AddDeck(name)
+					state.AddNewDeck(name)
 					return nil
 				},
 			},
